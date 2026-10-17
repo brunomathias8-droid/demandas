@@ -121,6 +121,7 @@ export default function Capture({ onClose, onManual, demandHint }) {
       const res = await sendCapture({ ...payload, demands: activeDemands });
       clearTimeout(t);
       setTranscript(res.transcript || '');
+      if (res.error) { setText(res.transcript || payload.text || ''); setError(res.error); setPhase('error'); return; }
       const list = (res.items || []).map((i) => ({
         ...i, key: ++seq, include: true,
         demand_id: i.demand_id ?? demandHint ?? null

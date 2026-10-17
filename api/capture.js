@@ -42,11 +42,11 @@ async function transcribe(base64, mime) {
       method: 'POST', headers: { Authorization: `Bearer ${key}` }, body: fd
     });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw Object.assign(new Error(j?.error?.message || `OpenAI ${r.status}`), { status: r.status });
+    if (!r.ok) throw Object.assign(new Error(j?.error?.message || `OpenAI ${r.status}`), { status: r.status, provider: 'OpenAI', type: j?.error?.code || j?.error?.type });
     return (j.text || '').trim();
   };
   try { return await attempt('gpt-4o-mini-transcribe'); }
-  catch (e) { if (e.status === 401) throw e; return attempt('whisper-1'); }
+  catch (e) { if (e.status === 401 || e.status === 429) throw e; return attempt('whisper-1'); }
 }
 
 const TOOL = {
@@ -118,7 +118,7 @@ async function classify({ text, demands, nowLocal, weekday }) {
     })
   });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw Object.assign(new Error(j?.error?.message || `Anthropic ${r.status}`), { status: r.status });
+  if (!r.ok) throw Object.assign(new Error(j?.error?.message || `Anthropic ${r.status}`), { status: r.status, provider: 'Anthropic', type: j?.error?.type });
   const block = (j.content || []).find((b) => b.type === 'tool_use');
   const items = Array.isArray(block?.input?.items) ? block.input.items : [];
   const ids = new Set(demands.map((d) => d.id));
@@ -138,6 +138,16 @@ async function classify({ text, demands, nowLocal, weekday }) {
       notes: typeof i.notes === 'string' && i.notes.trim() ? i.notes.trim().slice(0, 1000) : null,
       confidence: ['alta', 'media', 'baixa'].includes(i.confidence) ? i.confidence : 'media'
     }));
+}
+
+function friendly(e) {
+  const who = e.provider ? ` (${e.provider})` : '';
+  const m = (e.message || '').toLowerCase();
+  if (e.code === 'config') return 'Chave de IA não configurada na Vercel.';
+  if (e.code === 'too_big') return 'Áudio muito longo. Grave até 3 minutos.';
+  if (e.status === 401 || e.status === 403) return `Chave de IA inválida${who}. Confira na Vercel.`;
+  if (e.status === 429 || m.includes('credit') || m.includes('quota') || m.includes('billing')) return `Crédito ou limite esgotado${who}. Adicione crédito na conta.`;
+  return `Não consegui processar agora${who}. Tente de novo.`;
 }
 
 export default async function handler(req, res) {
@@ -166,16 +176,11 @@ export default async function handler(req, res) {
     try { items = await classify({ text: transcript, demands, nowLocal, weekday }); }
     catch (e) {
       console.error('classify', e);
-      return res.status(200).json({ transcript, items: [], warning: 'classify_failed' });
+      return res.status(200).json({ transcript, items: [], error: friendly(e) });
     }
     return res.status(200).json({ transcript, items });
   } catch (e) {
     console.error(e);
-    const msg = e.code === 'config' ? 'Chave de IA não configurada na Vercel.'
-      : e.code === 'too_big' ? 'Áudio muito longo. Grave até 3 minutos.'
-        : e.status === 401 ? 'Chave de IA inválida. Confira na Vercel.'
-          : e.status === 429 ? 'Limite ou crédito da IA esgotado.'
-            : 'Não consegui processar agora. Tente de novo.';
-    return res.status(e.code === 'too_big' ? 413 : 500).json({ error: msg });
+    return res.status(e.code === 'too_big' ? 413 : 500).json({ error: friendly(e) });
   }
 }
