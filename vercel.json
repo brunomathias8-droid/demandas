@@ -1,5 +1,7 @@
 {
   "functions": {
-    "api/capture.js": { "maxDuration": 60 }
+    "api/capture.js": { "maxDuration": 60 },
+    "api/inbox.js": { "maxDuration": 60 },
+    "api/notify.js": { "maxDuration": 30 }
   }
 }

@@ -1,6 +1,7 @@
 import { useStore } from '../lib/store';
 import { IconBack, IconCheck } from '../components/Icons';
 import NotificationSettings from '../components/NotificationSettings';
+import WhatsAppSettings from '../components/WhatsAppSettings';
 
 export const THEMES = [
   { id: 'escuro', label: 'Escuro', desc: 'Preto com verde-limão', bg: '#0D0E11', fg: '#F1F2F4', ac: '#C8F25A' },
@@ -36,6 +37,7 @@ export default function Settings({ theme, setTheme, onBack, name, setName }) {
       </section>
 
       {cloud && session && <NotificationSettings />}
+      {cloud && session && <WhatsAppSettings />}
 
       <section className="section">
         <h2 className="section-title tone-muted">Seu nome</h2>
@@ -65,7 +67,7 @@ export default function Settings({ theme, setTheme, onBack, name, setName }) {
         {!cloud && <p className="hint">Modo local: os dados ficam salvos só neste navegador. Com o Supabase configurado, passam a sincronizar entre aparelhos.</p>}
       </section>
 
-      <p className="hint center">Demandas · versão 0.3 (notificações)</p>
+      <p className="hint center">Demandas · versão 0.4 (WhatsApp)</p>
     </div>
   );
 }

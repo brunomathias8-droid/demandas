@@ -1,5 +1,6 @@
 import { useStore } from '../lib/store';
-import { DemandChip } from '../components/TaskRow';
+import { DemandChip, KIND_LABEL } from '../components/TaskRow';
+import { dueLabel } from '../lib/dates';
 import { IconChat, IconMic } from '../components/Icons';
 
 const SRC = { whatsapp: 'WhatsApp', voz: 'Áudio', texto: 'Texto' };
@@ -35,7 +36,11 @@ export default function Inbox({ onOpenTask }) {
               <div className="inbox-suggest">
                 <div className="field-label tone-accent">Sugestão</div>
                 <div className="inbox-title">{t.title}</div>
-                <div className="task-meta"><DemandChip demand={demandById[t.demand_id]} /></div>
+                <div className="task-meta">
+                  <DemandChip demand={demandById[t.demand_id]} />
+                  {t.kind !== 'fazer' && <span>{KIND_LABEL[t.kind]}</span>}
+                  {t.due_at && <span className="meta-due">{dueLabel(t)}</span>}
+                </div>
               </div>
               <div className="foot-row">
                 <button type="button" className="btn btn-primary btn-grow" onClick={() => (t.demand_id ? accept(t) : onOpenTask(t))}>Confirmar</button>
@@ -47,7 +52,7 @@ export default function Inbox({ onOpenTask }) {
       )}
 
       <div className="tip">
-        No WhatsApp: segure a mensagem ou o áudio › Compartilhar › <strong>Enviar para Demandas</strong>. Disponível na etapa 4.
+        No WhatsApp: segure a mensagem ou o áudio › Encaminhar › compartilhar › <strong>Enviar para Demandas</strong>. Para configurar, veja Ajustes › WhatsApp.
       </div>
     </div>
   );

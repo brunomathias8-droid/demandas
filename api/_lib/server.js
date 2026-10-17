@@ -71,6 +71,18 @@ export function localParts(date, tz) {
   return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
 }
 
+// Converte data/hora locais de um fuso em ISO (UTC)
+export function zonedToISO(dateStr, timeStr, tz) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [hh, mm] = (timeStr || '12:00').split(':').map(Number);
+  const guess = Date.UTC(y, m - 1, d, hh, mm);
+  const f = new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  const p = Object.fromEntries(f.formatToParts(new Date(guess)).map((x) => [x.type, x.value]));
+  const asIfUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+  return new Date(guess - (asIfUTC - guess)).toISOString();
+}
+
 // Atrasados e de hoje, no fuso do usuário
 export function summarize(tasks, tz, now = new Date()) {
   const today = localParts(now, tz).date;
