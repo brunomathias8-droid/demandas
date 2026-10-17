@@ -62,7 +62,7 @@ export default function Settings({ theme, setTheme, onBack, name, setName }) {
         {!cloud && <p className="hint">Modo local: os dados ficam salvos só neste navegador. Com o Supabase configurado, passam a sincronizar entre aparelhos.</p>}
       </section>
 
-      <p className="hint center">Demandas · versão 0.1 (núcleo)</p>
+      <p className="hint center">Demandas · versão 0.2 (captura inteligente)</p>
     </div>
   );
 }

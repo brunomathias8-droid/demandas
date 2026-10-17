@@ -9,7 +9,8 @@ import Settings from './screens/Settings';
 import Login from './screens/Login';
 import TaskSheet from './components/TaskSheet';
 import DemandSheet from './components/DemandSheet';
-import { IconGrid, IconInbox, IconPlus, IconSearch, IconSun } from './components/Icons';
+import Capture from './components/Capture';
+import { IconGrid, IconInbox, IconMic, IconSearch, IconSun } from './components/Icons';
 
 const THEME_COLOR = { escuro: '#0D0E11', calmo: '#F6F6F3', quente: '#F3ECE2' };
 const read = (k, d) => { try { return localStorage.getItem(k) ?? d; } catch { return d; } };
@@ -26,6 +27,7 @@ export default function App() {
   const [settings, setSettings] = useState(false);
   const [taskSheet, setTaskSheet] = useState(null);
   const [demandSheet, setDemandSheet] = useState(null);
+  const [capture, setCapture] = useState(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -83,13 +85,20 @@ export default function App() {
       <nav className="tabbar" aria-label="Navegação principal">
         {navItem('hoje', 'Hoje', IconSun)}
         {navItem('demandas', 'Demandas', IconGrid)}
-        <button type="button" className="fab" aria-label="Adicionar item" onClick={() => newTask(fabDefaults)}>
-          <IconPlus size={26} sw={2.6} />
+        <button type="button" className="fab" aria-label="Capturar: falar ou escrever" onClick={() => setCapture({ demandHint: detail || null })}>
+          <IconMic size={26} />
         </button>
         {navItem('entrada', 'Entrada', IconInbox, inboxCount)}
         {navItem('buscar', 'Buscar', IconSearch)}
       </nav>
 
+      {capture && (
+        <Capture
+          demandHint={capture.demandHint}
+          onClose={() => setCapture(null)}
+          onManual={() => { setCapture(null); newTask(fabDefaults); }}
+        />
+      )}
       {taskSheet && <TaskSheet key={taskSheet.task?.id || 'new'} task={taskSheet.task} defaults={taskSheet.defaults} onClose={() => setTaskSheet(null)} />}
       {demandSheet && <DemandSheet demand={demandSheet.demand} onClose={() => setDemandSheet(null)} onDeleted={() => setDetail(undefined)} />}
 

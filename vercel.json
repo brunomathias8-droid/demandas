@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/capture.js": { "maxDuration": 60 }
+  }
+}

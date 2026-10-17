@@ -2,13 +2,13 @@
 
 App pessoal de gestão de demandas: registre o que precisa fazer, falar ou lembrar, organize por assunto e receba alertas.
 
-**Versão 0.1 — Etapa 1 (núcleo)**
+**Versão 0.2 — Etapa 2 (captura inteligente)**
 
 | Etapa | Conteúdo | Situação |
 |---|---|---|
 | 1 | Demandas, itens, tela Hoje, Entrada, busca, três estilos visuais | Pronta |
-| 2 | Captura por voz e texto livre, com classificação automática | Próxima |
-| 3 | Notificações no iPhone e resumo da manhã | Planejada |
+| 2 | Captura por voz e texto livre, com classificação automática | Pronta |
+| 3 | Notificações no iPhone e resumo da manhã | Próxima |
 | 4 | Atalho do iPhone para enviar mensagens e áudios do WhatsApp | Planejada |
 
 ## Como funciona
@@ -79,3 +79,12 @@ Modelo de dados:
 
 - `demands`: nome, cor, descrição e palavras-chave (usadas pela IA na etapa 2).
 - `tasks`: título, demanda, tipo (fazer, falar, lembrar), situação (entrada, aberta, concluída), prazo, lembrete, origem (texto, voz, WhatsApp) e texto original.
+
+## Captura inteligente (etapa 2)
+
+- Botão do centro abre a captura: fale (até 3 minutos) ou escreva livremente.
+- O servidor (`api/capture.js`, função da Vercel) confere o login, transcreve o áudio (OpenAI) e separa os itens com o Claude, sugerindo demanda, tipo, prazo e aviso.
+- Você confere e ajusta cada item antes de salvar, ou guarda tudo na Entrada para revisar depois.
+- Aviso padrão: no horário do prazo, ou às 9:00 do dia do prazo.
+- Variáveis na Vercel (só servidor): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`. Opcional: `ANTHROPIC_MODEL` (padrão `claude-sonnet-5-5`).
+- Dica: preencha a descrição e as palavras-chave de cada demanda para melhorar a classificação.
