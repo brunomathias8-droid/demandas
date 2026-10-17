@@ -90,12 +90,12 @@ export default function WhatsAppSettings() {
         <ol className="wa-steps">
           <li>Abra o app <strong>Atalhos</strong> no iPhone e toque em <strong>+</strong>.</li>
           <li>Toque no nome no topo e chame de <strong>Enviar para Demandas</strong>.</li>
-          <li>Toque no <strong>i</strong> (ou nos ajustes do atalho) e ligue <strong>Mostrar na Planilha de Compartilhamento</strong>. Em tipos, deixe <strong>Texto</strong>, <strong>Arquivos</strong> e <strong>Mídia</strong>.</li>
+          <li>Toque no <strong>ⓘ</strong> e ligue <strong>Mostrar na Planilha de Compartilhamento</strong>. Depois, no bloco <strong>Receber … da Planilha de Compartilhamento</strong> no topo do atalho, toque nos tipos e marque <strong>todos</strong>.</li>
           <li>Adicione a ação <strong>Obter Conteúdo do URL</strong>. Em URL, cole o <strong>Endereço</strong>.</li>
           <li>Toque em <strong>Mostrar Mais</strong>: Método <strong>POST</strong>. Em Cabeçalhos, adicione <strong>Authorization</strong> com o valor do <strong>Código</strong> (inclui a palavra Bearer).</li>
           <li>Em Corpo da Solicitação, escolha <strong>Formulário</strong>, adicione um campo do tipo <strong>Arquivo</strong>, chame de <strong>conteudo</strong> e escolha como valor <strong>Entrada do Atalho</strong>.</li>
           <li>Adicione a ação <strong>Mostrar Notificação</strong> com o resultado de <strong>Conteúdo do URL</strong>.</li>
-          <li>No WhatsApp: segure uma mensagem ou áudio › <strong>Encaminhar</strong> › ícone de compartilhar › <strong>Enviar para Demandas</strong>.</li>
+          <li>No WhatsApp: segure uma mensagem ou áudio › <strong>Encaminhar</strong> › ícone de compartilhar (canto inferior esquerdo) › role até o fim › <strong>Enviar para Demandas</strong>. Use <strong>Editar Ações</strong> para deixá-lo no topo.</li>
         </ol>
       )}
     </section>
