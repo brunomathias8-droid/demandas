@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { bucketize } from './lib/dates';
+import { saveProfile } from './lib/push';
 import { useStore } from './lib/store';
 import Today from './screens/Today';
 import Demands from './screens/Demands';
@@ -36,6 +38,40 @@ export default function App() {
   }, [theme]);
   useEffect(() => { write('demandas.name', name); }, [name]);
   useEffect(() => { window.scrollTo(0, 0); }, [tab, detail, settings]);
+
+  // Selo no ícone: atrasadas + hoje
+  const badgeCount = useMemo(() => { const b = bucketize(tasks); return b.late.length + b.today.length; }, [tasks]);
+  useEffect(() => {
+    try {
+      if (badgeCount > 0) navigator.setAppBadge?.(badgeCount);
+      else navigator.clearAppBadge?.();
+    } catch { /* sem suporte */ }
+  }, [badgeCount]);
+
+  // Fuso do usuário para os avisos do servidor (uma vez por sessão)
+  useEffect(() => {
+    if (cloud && session) saveProfile({}).catch(() => {});
+  }, [cloud, session?.user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Abrir um item a partir da notificação (?task=id)
+  const [pendingTask, setPendingTask] = useState(() => new URLSearchParams(location.search).get('task'));
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (e.data?.type === 'open-url') {
+        const id = new URL(e.data.url, location.origin).searchParams.get('task');
+        if (id) setPendingTask(id);
+      }
+    };
+    navigator.serviceWorker?.addEventListener('message', onMsg);
+    return () => navigator.serviceWorker?.removeEventListener('message', onMsg);
+  }, []);
+  useEffect(() => {
+    if (!pendingTask || loading) return;
+    const t = tasks.find((x) => x.id === pendingTask);
+    if (t) { setTaskSheet({ task: t }); setDetail(undefined); setSettings(false); }
+    setPendingTask(null);
+    if (location.search) history.replaceState(null, '', location.pathname);
+  }, [pendingTask, loading, tasks]);
 
   if (cloud && !authReady) return <div className="splash" aria-busy="true" />;
   if (cloud && !session) return <Login />;

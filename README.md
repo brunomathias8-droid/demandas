@@ -2,14 +2,14 @@
 
 App pessoal de gestão de demandas: registre o que precisa fazer, falar ou lembrar, organize por assunto e receba alertas.
 
-**Versão 0.2 — Etapa 2 (captura inteligente)**
+**Versão 0.3 — Etapa 3 (notificações)**
 
 | Etapa | Conteúdo | Situação |
 |---|---|---|
 | 1 | Demandas, itens, tela Hoje, Entrada, busca, três estilos visuais | Pronta |
 | 2 | Captura por voz e texto livre, com classificação automática | Pronta |
-| 3 | Notificações no iPhone e resumo da manhã | Próxima |
-| 4 | Atalho do iPhone para enviar mensagens e áudios do WhatsApp | Planejada |
+| 3 | Notificações no iPhone e resumo da manhã | Pronta |
+| 4 | Atalho do iPhone para enviar mensagens e áudios do WhatsApp | Próxima |
 
 ## Como funciona
 
@@ -88,3 +88,11 @@ Modelo de dados:
 - Aviso padrão: no horário do prazo, ou às 9:00 do dia do prazo.
 - Variáveis na Vercel (só servidor): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`. Opcional: `ANTHROPIC_MODEL` (padrão `claude-sonnet-5-5`).
 - Dica: preencha a descrição e as palavras-chave de cada demanda para melhorar a classificação.
+
+## Notificações (etapa 3)
+
+- SQL: `supabase/migrations/002_notificacoes.sql` (assinaturas, perfil, segredo do agendador e agendamento a cada minuto via pg_cron + pg_net).
+- Variável na Vercel (só servidor): `SUPABASE_SERVICE_ROLE_KEY` (chave secreta do Supabase).
+- `api/notify.js`: chamado pelo agendador; envia lembretes vencidos e o resumo da manhã no fuso do usuário. Autorizado pelo segredo gerado no banco (`app_secrets.cron_secret`).
+- `api/push.js`: entrega a chave pública e envia notificação de teste. As chaves VAPID são geradas no primeiro uso e guardadas em `app_secrets`.
+- No iPhone, notificações exigem o app instalado na tela de início (iOS 16.4+). Ativação em Ajustes › Notificações.
