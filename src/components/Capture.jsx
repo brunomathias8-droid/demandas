@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../lib/store';
 import { MAX_SECONDS, blobToBase64, defaultReminder, itemToTask, pickMime, sendCapture } from '../lib/capture';
 import { dueLabel, reminderLabel } from '../lib/dates';
+import { getMic, idleMic } from '../lib/mic';
 import { IconCheck, IconClose, IconEdit, IconMic } from './Icons';
 
 const BARS = 28;
@@ -104,7 +105,7 @@ export default function Capture({ onClose, onManual, demandHint }) {
   const cleanup = () => {
     clearInterval(timerRef.current);
     cancelAnimationFrame(rafRef.current);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    if (streamRef.current) idleMic();
     ctxRef.current?.close?.().catch(() => {});
     streamRef.current = null; ctxRef.current = null;
   };
@@ -141,7 +142,7 @@ export default function Capture({ onClose, onManual, demandHint }) {
       setError('Este navegador não grava áudio. Use o Safari atualizado ou escreva.'); setPhase('error'); return;
     }
     let stream;
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    try { stream = await getMic(); }
     catch (e) { setError(micMessage(e)); setPhase('error'); return; }
     streamRef.current = stream;
     cancelRef.current = false;
